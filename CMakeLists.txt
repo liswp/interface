@@ -92,6 +92,7 @@ find_package(graspit)
    SaveWorld.srv
    ClearWorld.srv
    SaveImage.srv
+   GetImage.srv
    ToggleAllCollisions.srv
    ComputeQuality.srv
    ComputeEnergy.srv

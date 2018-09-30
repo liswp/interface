@@ -8,6 +8,7 @@
 #endif
 
 //GraspIt! includes
+#include <qimage.h>
 #include <graspit/plugin.h>
 #include <graspit/EGPlanner/searchState.h>
 #include <graspit/EGPlanner/simAnnPlanner.h>
@@ -39,6 +40,7 @@
 #include <graspit_interface/LoadWorld.h>
 #include <graspit_interface/ClearWorld.h>
 #include <graspit_interface/SaveWorld.h>
+#include <graspit_interface/GetImage.h>
 #include <graspit_interface/SaveImage.h>
 #include <graspit_interface/ToggleAllCollisions.h>
 #include <graspit_interface/ComputeQuality.h>
@@ -92,6 +94,7 @@ private:
   ros::ServiceServer saveWorld_srv;
 
   ros::ServiceServer saveImage_srv;
+  ros::ServiceServer getImage_srv;
   ros::ServiceServer toggleAllCollisions_srv;
 
   ros::ServiceServer computeQuality_srv;
@@ -182,6 +185,8 @@ private:
 
   bool saveImageCB(graspit_interface::SaveImage::Request &request,
                      graspit_interface::SaveImage::Response &response);
+  bool getImageCB(graspit_interface::GetImage::Request &request,
+                       graspit_interface::GetImage::Response &response);
 
   bool toggleAllCollisionsCB(graspit_interface::ToggleAllCollisions::Request &request,
                      graspit_interface::ToggleAllCollisions::Response &response);

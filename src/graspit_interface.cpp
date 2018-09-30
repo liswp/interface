@@ -5,7 +5,7 @@
 #include <graspit/robot.h>
 #include <graspit/world.h>
 #include <graspit/ivmgr.h>
-
+#include <qimage.h>
 #include <graspit/quality/quality.h>
 #include <graspit/quality/qualVolume.h>
 #include <graspit/quality/qualEpsilon.h>
@@ -74,6 +74,7 @@ int GraspitInterface::init(int argc, char** argv)
     saveWorld_srv = nh->advertiseService("saveWorld", &GraspitInterface::saveWorldCB, this);
 
     saveImage_srv = nh->advertiseService("saveImage", &GraspitInterface::saveImageCB, this);
+    getImage_srv = nh->advertiseService("getImage", &GraspitInterface::getImageCB, this);
     toggleAllCollisions_srv = nh->advertiseService("toggleAllCollisions", &GraspitInterface::toggleAllCollisionsCB, this);
 
     computeQuality_srv = nh->advertiseService("computeQuality", &GraspitInterface::computeQualityCB, this);
@@ -396,7 +397,7 @@ bool GraspitInterface::autoGraspCB(graspit_interface::AutoGrasp::Request &reques
         return true;
     }
     else{
-        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, 1.0, false);
+        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, 10.0, false);
         graspitCore->getWorld()->updateGrasps();
     }
     return true;
@@ -410,7 +411,7 @@ bool GraspitInterface::autoOpenCB(graspit_interface::AutoOpen::Request &request,
         return true;
     }
     else{
-        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, -1.0, false);
+        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, -10.0, false);
         graspitCore->getWorld()->updateGrasps();
     }
     return true;
@@ -576,7 +577,7 @@ bool GraspitInterface::loadWorldCB(graspit_interface::LoadWorld::Request &reques
             QString(request.filename.data()) +
             QString(".xml");
 
-    ROS_INFO("Loading World: %s",filename.toStdString().c_str());
+    // ROS_INFO("Loading World: %s",filename.toStdString().c_str());
     int result = graspitCore->getWorld()->load(filename);
     if(result == FAILURE){
         response.result = response.RESULT_FAILURE;
@@ -605,22 +606,49 @@ bool GraspitInterface::saveWorldCB(graspit_interface::SaveWorld::Request &reques
 bool GraspitInterface::clearWorldCB(graspit_interface::ClearWorld::Request &request,
                    graspit_interface::ClearWorld::Response &response)
 {
-    ROS_INFO("Emptying World");
+    // ROS_INFO("Emptying World");
     graspitCore->emptyWorld();
 
     return true;
 }
 
 bool GraspitInterface::saveImageCB(graspit_interface::SaveImage::Request &request,
-                   graspit_interface::SaveImage::Response &response)
-{
-    QString filename = QString(getenv("GRASPIT"))+
-            QString("/images/") +
-            QString(request.filename.data()) +
-            QString(".jpg");
+                   graspit_interface::SaveImage::Response &response) {
+    QString filename;
+    filename = QString(getenv("GRASPIT")) +
+                    QString("/images/") +
+                    QString(request.filename.data()) +
+                    QString(".jpg");
+//        ROS_INFO("Saving Image: %s",filename.toStdString().c_str());
+        graspitCore->getIVmgr()->saveImage(filename, request.height, request.width);
 
-    ROS_INFO("Saving Image: %s",filename.toStdString().c_str());
-    graspitCore->getIVmgr()->saveImage(filename);
+    if (request.depth) {
+        filename = QString(getenv("GRASPIT")) +
+                    QString("/images/") +
+                    QString(request.filename.data()) +
+                    QString("_depth.jpg");
+//        ROS_INFO("Saving Depth Image: %s",filename.toStdString().c_str());
+        graspitCore->getIVmgr()->saveDepthImage(filename, request.height, request.width);
+    }
+
+
+    return true;
+}
+
+bool GraspitInterface::getImageCB(graspit_interface::GetImage::Request &request,
+                                   graspit_interface::GetImage::Response &response) {
+    QImage img = graspitCore->getIVmgr()->getImage(request.height, request.width);
+    int i = 0;
+    for ( int col = 0; col < img.width(); ++col ) {
+        for ( int row = 0; row < img.height(); ++row ) {
+            QColor clrCurrent(img.pixel(row, col));
+            response.r[i] = clrCurrent.red();
+            response.g[i] = clrCurrent.green();
+            response.b[i] = clrCurrent.blue();
+            i += 1;
+        }
+    }
+
     return true;
 }
 

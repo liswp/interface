@@ -1,0 +1,6 @@
+int32 height
+int32 width
+---
+int32[12544] r
+int32[12544] g
+int32[12544] b
