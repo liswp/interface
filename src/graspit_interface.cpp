@@ -397,7 +397,7 @@ bool GraspitInterface::autoGraspCB(graspit_interface::AutoGrasp::Request &reques
         return true;
     }
     else{
-        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, 10.0, false);
+        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, 100.0, false);
         graspitCore->getWorld()->updateGrasps();
     }
     return true;
@@ -411,7 +411,7 @@ bool GraspitInterface::autoOpenCB(graspit_interface::AutoOpen::Request &request,
         return true;
     }
     else{
-        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, -10.0, false);
+        graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, -100.0, false);
         graspitCore->getWorld()->updateGrasps();
     }
     return true;
