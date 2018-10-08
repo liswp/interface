@@ -612,6 +612,7 @@ bool GraspitInterface::clearWorldCB(graspit_interface::ClearWorld::Request &requ
     return true;
 }
 
+
 bool GraspitInterface::saveImageCB(graspit_interface::SaveImage::Request &request,
                    graspit_interface::SaveImage::Response &response) {
     QString filename;
